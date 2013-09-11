@@ -3,12 +3,20 @@
     (:require [clojure.java.jdbc :as sql]))
 
 
-(def db-config
+(def h2-db-config
       {:classname "org.h2.Driver"
        :subprotocol "h2"
        :subname "mem:documents"
        :user ""
        :password ""})
+
+(def oracle-db-config
+      {:classname "oracle.jdbc.OracleDriver" 
+       :subprotocol "oracle"
+       :subname "thin:@localhost:1521:XE" 
+       :user "janne"
+       :password "???"})
+
 
 (defn pool
       [config]
@@ -22,7 +30,7 @@
                    (.setInitialPoolSize 1))]
         {:datasource cpds}))
 
-(def pooled-db (delay (pool db-config)))
+(def pooled-db (delay (pool oracle-db-config)))
 
 (defn db-connection [] @pooled-db)
 

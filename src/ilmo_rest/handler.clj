@@ -10,19 +10,30 @@
               [ilmo-rest.devdb :as db]))
 
 (defn get-all-trainings []
-      (response
-        (sql/with-connection (db/db-connection)
-          (sql/with-query-results results
-            ["select * from training"]
-            (into [] results)))))
+  (response
+     (sql/with-connection (db/db-connection)
+       (sql/with-query-results results
+         ["select * from training"]
+           (into [] results)))))
 
+(defn user-report [username]
+  (response
+     (sql/with-connection (db/db-connection)
+       (sql/with-query-results results
+         [(str "select t.name, to_char(ts.date_c, 'yyyy-mm-dd') when " 
+               "from training t join trainingsession ts on (t.id=ts.training) "
+               "     join participant p on (ts.id = p.trainingsession)"
+               "where p.name like ?") username]
+           (into [] results)))))
 
 (defn create-new-training [training]
     (sql/with-connection (db/db-connection)
-        (let [generated-training-id (sql/insert-record :training training)]
-            generated-training-id)))
+        (sql/insert-record :training training)))
 
 (defroutes app-routes
+      (GET "/foo" [] (user-report "Janne Rintanen"))
+      (context "/reports" [] (defroutes reports-routes
+        (GET  "/user/:name" [name] (user-report name))))
       (context "/trainings" [] (defroutes trainings-routes
         (GET  "/" [] (get-all-trainings))
         (POST "/" {body :body} (create-new-training body))))
