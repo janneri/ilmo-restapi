@@ -14,8 +14,8 @@
       {:classname "oracle.jdbc.OracleDriver" 
        :subprotocol "oracle"
        :subname "thin:@localhost:1521:XE" 
-       :user "janne"
-       :password "???"})
+       :user "??"
+       :password "??"})
 
 
 (defn pool
